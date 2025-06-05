@@ -44,9 +44,8 @@
 
 ;; Tofu characters solution
 (when (display-graphic-p)
-  (set-face-attribute 'default nil :font "JetbrainsMono Nerd Font-16")
-  (set-fontset-font t 'unicode "NotoColor Emoji" nil 'prepend)
-  )
+  (set-face-attribute 'default nil :font (font-spec :family "Maple Mono NF CN" :style "Italic" :size 24))
+  (set-fontset-font t 'unicode "NotoColor Emoji" nil 'prepend))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
