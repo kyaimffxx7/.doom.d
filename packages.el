@@ -21,6 +21,11 @@
 ;;   :recipe (:host github :repo "username/repo"
 ;;            :files ("some-file.el" "src/lisp/*.el")))
 
+;; catppuccin theme
+(package! catppuccin-theme)
+
+; (package! kind-icon)
+
 ;; If you'd like to disable a package included with Doom, you can do so here
 ;; with the `:disable' property:
 ;; (package! builtin-package :disable t)
