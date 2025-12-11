@@ -71,18 +71,21 @@
 ;; - `map!' for binding new keys
 ;;
 ;; Set up company
-;;(use-package company
-;;  :hook (prog-mode . company-mode)
-;;  :config
-;;  (setq company-idle-delay 0.2
-;;        company-minimum-prefix-length 2))
+(setq company-idle-delay 0.2)
+(setq company-minimum-prefix-length 2)
 
-;; eglot
-(add-hook 'rust-mode-hook #'eglot-ensure)
-(add-hook 'rust-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook #'eglot-format-buffer nil 'local)))
-; (define-key eglot-mode-map (kbd "C-c C-h") #'eldoc-print-current-symbol-info)
+; (set-company-backend! 'rust-mode '(company-lsp))
+; (set-company-backend! 'prog-mode '(company-yasnippet company-lsp))
+
+(map! :map company-active-map
+      "TAB" #'company-complete-selection)
+
+(use-package! lsp-ui
+  :config
+  (setq lsp-ui-doc-enable t)
+  (setq lsp-ui-doc-position 'float)
+  (setq lsp-ui-doc-max-width 120)
+  (setq lsp-ui-doc-max-height 20))
 
 ;; lsp-ui-doc
 ; (add-hook 'lsp-mode-hook #'lsp-ui-doc-mode)
@@ -96,36 +99,6 @@
 ;     (when (lsp-feature? :inlayHints)
 ;       (lsp-inlay-hints-mode 1))))
 
-; (use-package! kind-icon
-;   :after corfu
-;   :custom
-;   (kind-icon-default-face 'corfu-default)
-;   :config
-;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
-(setq completion-system 'corfu)
-(corfu-mode 1)
-
-(after! corfu
-  (setq corfu-auto t
-        corfu-auto-delay 0.1
-        corfu-min-width 80
-        corfu-count 15))
-
-;;;; Setup corfu
-; (use-package! corfu
-;   :init
-;   (global-corfu-mode)    ;; Globally activate
-;   (corfu-history-mode)   ;; collect inputs of history
-;   (corfu-popupinfo-mode) ;; show detail info of the completion
-;   :config
-;   (setq corfu-cycle t
-;         corfu-auto t
-;         corfu-auto-prefix 2
-;         corfu-auto-delay 0.0
-;         corfu-popupinfo-delay 0.2
-;         corfu-sort-function #'corfu-sort-alpha))
-
 ;; Integrating with cape
 (use-package! cape
   :init
@@ -135,18 +108,8 @@
   (add-hook 'eglot-managed-mode-hook (lambda () (setq-local completion-at-point-functions (list (cape-capf-super #'eglot-completion-at-point)))))
 )
 
-;; Setup shortcuts
-
-
 ;; Set up marginalia
 (marginalia-mode t)
-
-;; Set up orderless
-(use-package orderless
-  :config
-  (setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides nil))
 
 ;; Set up super-save
 (use-package super-save
@@ -162,17 +125,16 @@
 (use-package undo-fu
   :config
   (setq undo-limit 80000000))
-
-;; Setup python, rust lsp
-(setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin/"))
-(after! lsp-mode
-  (setq lsp-rust-server 'rust-analyzer)
-  (setq lsp-enabled-clients '(pyright))
-  (setq lsp-disabled-clients '(pylsp mspyls)))
-
-;; Setup rust DE
-(add-hook! 'rust-mode
-  (lsp-format-enable)) ; format enable
+  
+(use-package! rustic
+  :config
+  ;; 设置 rust-analyzer 路径（默认自动查找）
+  (setq rustic-rustfmt-path "rustfmt")
+  (setq rustic-cargo-path "cargo")
+  (setq rustic-lsp-server 'rust-analyzer)  ; 明确指定 LSP 服务器
+  ;; LSP 配置
+  (add-hook 'rustic-mode-hook #'lsp-deferred))  ; 延迟启动 LSP
+  
 
 (setq lsp-idle-delay 0.5)
 (setq lsp-completion-provider :capf)
@@ -183,6 +145,11 @@
 ;; Setup auto-wrap
 (add-hook! 'text-mode-hook #'visual-line-mode)
 
+;; helix keybindings
+;;(use-package helix                  
+;;  :ensure t
+;;  :config
+;;  (helix-mode))
 ;; To get information about any of these functions/macros, move the cursor over
 ;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
 ;; This will open documentation for it, including demos of how they are used.
